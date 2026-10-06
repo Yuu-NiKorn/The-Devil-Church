@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerSanity : MonoBehaviour
@@ -6,92 +7,57 @@ public class PlayerSanity : MonoBehaviour
     [SerializeField] private PlayerCandle candle;
 
     [Header("Sanity")]
-    [SerializeField] private float maxSanity = 100f;
-
-    [Tooltip("Santé mentale perdue par seconde dans le noir.")]
-    [SerializeField] private float sanityLossPerSecond = 2f;
+    [SerializeField, Min(1f)] private float maxSanity = 100f;
+    [SerializeField, Min(0f)] private float sanityLossPerSecond = 10f;
 
     [Header("Temporary Test Input")]
-    [SerializeField] private KeyCode restoreSanityKey = KeyCode.M;
+    [SerializeField] private KeyCode restoreSanityKey = KeyCode.N;
 
     private float currentSanity;
+    private bool isDead;
 
     public float CurrentSanity => currentSanity;
-
     public float MaxSanity => maxSanity;
-
     public float NormalizedSanity =>
-        maxSanity <= 0f
-            ? 0f
-            : currentSanity / maxSanity;
+        Mathf.Clamp01(currentSanity / maxSanity);
 
-    public bool IsDead =>
-        currentSanity <= 0f;
+    public bool IsDead => isDead;
 
-    private void Start()
+    public event Action OnDeath;
+
+    private void Awake()
     {
-        Debug.Log("PLAYER SANITY START !!!");
-
         currentSanity = maxSanity;
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(restoreSanityKey))
-        {
-            RestoreSanity();
-        }
-
-        UpdateSanity();
-    }
-    
-    
-    private bool HandleDebugInput()
-    {
-        if (Input.GetKeyDown(restoreSanityKey))
-        {
-            Debug.Log("M APPUYÉ → RESTAURATION SANITY");
-
-            RestoreSanity();
-
-            Debug.Log("Sanity après restauration : " + currentSanity);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private void UpdateSanity()
-    {
-        if (IsDead)
+        if (isDead)
             return;
+
+        if (Input.GetKeyDown(restoreSanityKey))
+            RestoreSanity();
 
         if (candle != null && !candle.HasLight)
         {
-            currentSanity -=
-                sanityLossPerSecond *
-                Time.deltaTime;
-
             currentSanity = Mathf.Max(
-                currentSanity,
-                0f
+                0f,
+                currentSanity - sanityLossPerSecond * Time.deltaTime
             );
         }
 
         if (currentSanity <= 0f)
         {
-            OnSanityDepleted();
+            isDead = true;
+            OnDeath?.Invoke();
         }
     }
 
     public void RestoreSanity()
     {
-        currentSanity = maxSanity;
-    }
+        if (isDead)
+            return;
 
-    private void OnSanityDepleted()
-    {
-        Debug.Log("GAME OVER - Sanity depleted");
+        currentSanity = maxSanity;
     }
 }
