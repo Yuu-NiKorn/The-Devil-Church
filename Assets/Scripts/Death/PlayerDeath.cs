@@ -139,4 +139,9 @@ public class PlayerDeath : MonoBehaviour
                 "MainMenu : scène introuvable dans les scènes du build."
             );
     }
+    
+    public void KillPlayer()
+    {
+        HandleDeath();
+    }
 }
