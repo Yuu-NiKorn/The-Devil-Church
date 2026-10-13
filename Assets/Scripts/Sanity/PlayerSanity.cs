@@ -60,4 +60,15 @@ public class PlayerSanity : MonoBehaviour
 
         currentSanity = maxSanity;
     }
+    
+    public void RestoreSanityAmount(float amount)
+    {
+        if (IsDead || amount <= 0f)
+            return;
+
+        currentSanity = Mathf.Min(
+            currentSanity + amount,
+            maxSanity
+        );
+    }
 }

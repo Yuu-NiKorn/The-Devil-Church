@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDataSO
   itemID: cross
   itemName: Cross
-  description: cross cross cross cross cross
+  description: 'cross cross cross cross cross
+
+    +40 sanity'
   icon: {fileID: -7089530933276561733, guid: 12a17915730ba8246b448f76bdb1fb00, type: 3}
   category: 0
   maxStack: 10

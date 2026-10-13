@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerCandle : MonoBehaviour
@@ -8,22 +9,23 @@ public class PlayerCandle : MonoBehaviour
 
     [Header("Candle Lifetime")]
     [Tooltip("Durée d'une bougie complète en secondes.")]
-    [SerializeField] private float candleDuration = 300f;
+    [SerializeField, Min(0.1f)]
+    private float candleDuration = 300f;
 
     [Header("Temporary Test Input")]
+    [SerializeField] private bool enableDebugReplacement = false;
     [SerializeField] private KeyCode replaceCandleKey = KeyCode.B;
 
     private float remainingTime;
 
     public bool HasLight { get; private set; }
 
-    public bool IsBurnedOut =>
-        remainingTime <= 0f;
+    public bool IsBurnedOut => remainingTime <= 0f;
 
     public float RemainingNormalized =>
-        candleDuration <= 0f
-            ? 0f
-            : Mathf.Clamp01(remainingTime / candleDuration);
+        Mathf.Clamp01(remainingTime / candleDuration);
+
+    public event Action OnCandleBurnedOut;
 
     private void Start()
     {
@@ -32,16 +34,13 @@ public class PlayerCandle : MonoBehaviour
 
     private void Update()
     {
-        HandleDebugInput();
-        UpdateCandle();
-    }
-
-    private void HandleDebugInput()
-    {
-        if (Input.GetKeyDown(replaceCandleKey))
+        if (enableDebugReplacement &&
+            Input.GetKeyDown(replaceCandleKey))
         {
             ReplaceCandle();
         }
+
+        UpdateCandle();
     }
 
     private void UpdateCandle()
@@ -56,6 +55,10 @@ public class PlayerCandle : MonoBehaviour
             remainingTime = 0f;
 
             Extinguish();
+            UpdateVisual();
+
+            OnCandleBurnedOut?.Invoke();
+            return;
         }
 
         UpdateVisual();
@@ -64,11 +67,7 @@ public class PlayerCandle : MonoBehaviour
     private void UpdateVisual()
     {
         if (candleVisual != null)
-        {
-            candleVisual.SetBurnAmount(
-                RemainingNormalized
-            );
-        }
+            candleVisual.SetBurnAmount(RemainingNormalized);
     }
 
     private void Extinguish()
@@ -76,21 +75,16 @@ public class PlayerCandle : MonoBehaviour
         HasLight = false;
 
         if (candleLight != null)
-        {
             candleLight.enabled = false;
-        }
     }
 
     public void ReplaceCandle()
     {
         remainingTime = candleDuration;
-
         HasLight = true;
 
         if (candleLight != null)
-        {
             candleLight.enabled = true;
-        }
 
         UpdateVisual();
     }
