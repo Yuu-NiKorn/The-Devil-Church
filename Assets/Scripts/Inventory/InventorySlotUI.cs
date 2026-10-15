@@ -11,6 +11,8 @@ public class InventorySlotUI : MonoBehaviour
     [SerializeField] private GameObject selectionHighlight;
 
     private ItemDataSO item;
+    
+    public ItemDataSO Item => item;
 
     public void Setup(
         ItemDataSO itemData,

@@ -44,6 +44,12 @@ public class InventoryUI : MonoBehaviour
     private bool isOpen;
 
     private readonly List<InventorySlotUI> slots = new();
+    
+    [Header("Notes")]
+    [SerializeField] private InventoryNoteSlotUI noteSlotPrefab;
+    [SerializeField] private ScrollRect descriptionScrollRect;
+
+    private readonly List<InventoryNoteSlotUI> noteSlots = new();
 
     private void Start()
     {
@@ -120,6 +126,8 @@ public class InventoryUI : MonoBehaviour
     {
         if (!isOpen || inventory == null)
             return;
+        Debug.Log("[NOTES DEBUG] Page : " + currentPage
+                                          + " | Objets dans l'inventaire : " + inventory.Items.Count);
 
         foreach (InventorySlotUI slot in slots)
         {
@@ -129,26 +137,61 @@ public class InventoryUI : MonoBehaviour
 
         slots.Clear();
         selectedItem = null;
+        
+        foreach (InventoryNoteSlotUI noteSlot in noteSlots)
+        {
+            if (noteSlot != null)
+                Destroy(noteSlot.gameObject);
+        }
+
+        noteSlots.Clear();
 
         foreach (InventoryEntry entry in inventory.Items)
         {
+            Debug.Log("[NOTES DEBUG] Objet : "
+                      + (entry.item != null ? entry.item.itemName : "NULL")
+                      + " | Catégorie : "
+                      + (entry.item != null ? entry.item.category.ToString() : "NULL"));
+            
             if (!BelongsToCurrentPage(entry.item))
                 continue;
 
-            InventorySlotUI slot = Instantiate(
-                slotPrefab,
-                currentPage == InventoryPage.Notes
-                    ? notesList
-                    : itemGrid
-            );
+            if (currentPage == InventoryPage.Notes)
+            {
+                Debug.Log("[NOTES DEBUG] Création de la note demandée");
 
-            slot.Setup(
-                entry.item,
-                entry.quantity,
-                SelectItem
-            );
+                InventoryNoteSlotUI noteSlot = Instantiate(
+                    noteSlotPrefab,
+                    notesList
+                );
 
-            slots.Add(slot);
+                noteSlot.Setup(entry.item, SelectItem);
+                noteSlots.Add(noteSlot);
+
+                Debug.Log(
+                    "[NOTES DEBUG] Note créée : " +
+                    noteSlot.name +
+                    " | Parent : " +
+                    noteSlot.transform.parent.name +
+                    " | Active : " +
+                    noteSlot.gameObject.activeSelf
+                );
+            }
+            else
+            {
+                InventorySlotUI slot = Instantiate(
+                    slotPrefab,
+                    itemGrid
+                );
+
+                slot.Setup(
+                    entry.item,
+                    entry.quantity,
+                    SelectItem
+                );
+
+                slots.Add(slot);
+            }
         }
 
         itemGrid.gameObject.SetActive(
@@ -194,23 +237,32 @@ public class InventoryUI : MonoBehaviour
         selectedItem = item;
 
         foreach (InventorySlotUI slot in slots)
-            slot.SetSelected(false);
+            slot.SetSelected(slot.Item == item);
 
-        itemTitle.text = item.itemName;
+        foreach (InventoryNoteSlotUI noteSlot in noteSlots)
+            noteSlot.SetSelected(noteSlot.Item == item);
 
         if (item.category == ItemCategory.Note &&
             item.noteData != null)
         {
+            itemTitle.text = item.noteData.noteTitle;
             itemDescription.text = item.noteData.noteText;
         }
         else
         {
+            itemTitle.text = item.itemName;
             itemDescription.text = item.description;
         }
 
         useButton.gameObject.SetActive(
             item.category == ItemCategory.Consumable
         );
+
+        if (descriptionScrollRect != null)
+        {
+            Canvas.ForceUpdateCanvases();
+            descriptionScrollRect.verticalNormalizedPosition = 1f;
+        }
     }
 
     private void ClearSelection()

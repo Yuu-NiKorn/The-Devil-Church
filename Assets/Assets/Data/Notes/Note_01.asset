@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a20c698c98e50c243a5b2033fe1e4b0b, type: 3}
+  m_Name: Note_01
+  m_EditorClassIdentifier: Assembly-CSharp::NoteDataSO
+  noteID: note_01
+  noteTitle: "Journal du pr\xEAtre"
+  noteText: "14 octobre \u2014 Je ne sais plus depuis combien de jours les cloches sonnent seules.\n\n  Hier soir, j'ai entendu des pas dans la nef. Lorsque j'ai ouvert la porte, toutes les bougies \xE9taient \xE9teintes.\n\n  Le chien refuse d\xE9sormais de s'approcher de l'autel.\n\n  J'ai cach\xE9 la cl\xE9 dans la sacristie. Si quelqu'un trouve ce journal, qu'il ne descende surtout pas sous l'\xE9glise.\n\n  Il y a quelque chose l\xE0-dessous.\n\n  Et cette chose conna\xEEt nos noms."
