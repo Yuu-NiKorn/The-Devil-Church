@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6f827c5bb282b349be3a8993963ad9b, type: 3}
+  m_Name: ChildQuest
+  m_EditorClassIdentifier: Assembly-CSharp::QuestDataSO
+  questID: child_medallion
+  questName: "Le m\xE9daillon perdu"
+  description: "Retrouver le m\xE9daillon de l'enfant"
+  requiredItem: {fileID: 11400000, guid: dc16a7a83489cd243be5590a49de5545, type: 2}
+  requiredQuantity: 1
+  firstDialogue: {fileID: 11400000, guid: 7e677f72b0a57dd44b2bc79600d13697, type: 2}
+  reminderDialogue: {fileID: 11400000, guid: df42d393b1b6ec147b5f214c75ac8cf8, type: 2}
+  completionDialogue: {fileID: 11400000, guid: e4b0af903f68deb4abeb71c9471032bc, type: 2}

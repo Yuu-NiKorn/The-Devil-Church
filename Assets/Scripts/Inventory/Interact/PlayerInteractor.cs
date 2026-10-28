@@ -14,7 +14,9 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private PickupPromptUI pickupPrompt;
 
     private readonly Collider[] results = new Collider[32];
+
     private ItemPickup currentPickup;
+    private NPCInteraction currentNPC;
 
     private void Awake()
     {
@@ -24,18 +26,25 @@ public class PlayerInteractor : MonoBehaviour
 
     private void Update()
     {
-        FindClosestPickup();
+        FindClosestInteractable();
+        UpdateInteractionUI();
 
-        if (pickupPrompt != null)
+        if (!Input.GetKeyDown(interactionKey))
+            return;
+
+        if (currentNPC != null)
         {
-            if (currentPickup != null)
-                pickupPrompt.Show(currentPickup);
-            else
-                pickupPrompt.Hide();
-        }
+            NPCInteraction npc = currentNPC;
 
-        if (currentPickup != null &&
-            Input.GetKeyDown(interactionKey))
+            currentNPC = null;
+            currentPickup = null;
+
+            if (pickupPrompt != null)
+                pickupPrompt.Hide();
+
+            npc.Interact();
+        }
+        else if (currentPickup != null)
         {
             if (currentPickup.TryPickup(inventory))
             {
@@ -47,9 +56,30 @@ public class PlayerInteractor : MonoBehaviour
         }
     }
 
-    private void FindClosestPickup()
+    private void UpdateInteractionUI()
+    {
+        if (pickupPrompt == null)
+            return;
+
+        if (currentNPC != null)
+        {
+            pickupPrompt.Show(currentNPC);
+        }
+        else if (currentPickup != null)
+        {
+            pickupPrompt.Show(currentPickup);
+        }
+        else
+        {
+            pickupPrompt.Hide();
+        }
+    }
+
+    private void FindClosestInteractable()
     {
         currentPickup = null;
+        currentNPC = null;
+
         float closestDistance = interactionRadius;
 
         int count = Physics.OverlapSphereNonAlloc(
@@ -62,28 +92,69 @@ public class PlayerInteractor : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
+            Collider hit = results[i];
+
+            if (hit == null)
+                continue;
+
+            // Recherche d'un PNJ
+            NPCInteraction npc =
+                hit.GetComponentInParent<NPCInteraction>();
+
+            if (npc != null)
+            {
+                if (!npc.CanInteract)
+                    continue;
+
+                float distance = Vector3.Distance(
+                    transform.position,
+                    npc.InteractionPosition
+                );
+
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    currentNPC = npc;
+                    currentPickup = null;
+                }
+
+                continue;
+            }
+
+            // Recherche d'un objet
             ItemPickup pickup =
-                results[i].GetComponentInParent<ItemPickup>();
+                hit.GetComponentInParent<ItemPickup>();
 
             if (pickup == null || pickup.ItemData == null)
                 continue;
 
-            float distance = Vector3.Distance(
+            float pickupDistance = Vector3.Distance(
                 transform.position,
                 pickup.InteractionPosition
             );
 
-            if (distance < closestDistance)
+            if (pickupDistance < closestDistance)
             {
-                closestDistance = distance;
+                closestDistance = pickupDistance;
                 currentPickup = pickup;
+                currentNPC = null;
             }
         }
+    }
+
+    private void OnDisable()
+    {
+        currentPickup = null;
+        currentNPC = null;
+
+        if (pickupPrompt != null)
+            pickupPrompt.Hide();
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
+
         Gizmos.DrawWireSphere(
             transform.position,
             interactionRadius
