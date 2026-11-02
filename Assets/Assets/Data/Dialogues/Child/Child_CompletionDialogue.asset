@@ -13,12 +13,18 @@ MonoBehaviour:
   m_Name: Child_CompletionDialogue
   m_EditorClassIdentifier: Assembly-CSharp::DialogueDataSO
   lines:
-  - speakerName: Chris
-    text: Tiens cadeau.
+  - speakerName: L'enfant
+    text: "Oh tu l\u2019as trouv\xE9 ? Merci beaucoup !!!"
     voiceClip: {fileID: 0}
-  - speakerName: Valou
-    text: "Merci tu auras le droit \xE0 des beignets \xE0 la rentr\xE9e."
+  - speakerName: L'enfant
+    text: "Oui, tu peux sortir de ta cachette mon petit, et je vais t\u2019aider \xE0 trouver tes parents ne t\u2019inqui\xE8te pas, peut tu me dire comment tu t\u2019appelles ? "
     voiceClip: {fileID: 0}
-  - speakerName: Chris
-    text: Waaa trop sympa le chef.
+  - speakerName: Henry
+    text: "Henry\u2026. tiens je n\u2019ai plus froid ! Et je peux entendre mes parents m\u2019appeler !!! "
+    voiceClip: {fileID: 0}
+  - speakerName: Henry
+    text: 'Ils sont tout proches ! je vais les rejoindre !  '
+    voiceClip: {fileID: 0}
+  - speakerName: Henry
+    text: "Merci monsieur le pr\xEAtre ! Au revoir ! "
     voiceClip: {fileID: 0}

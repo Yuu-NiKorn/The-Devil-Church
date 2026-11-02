@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Child_ReminderDialogue
   m_EditorClassIdentifier: Assembly-CSharp::DialogueDataSO
   lines:
-  - speakerName: Valou
-    text: VAS CHERCHER LE SAUCEEEEEEEEEEEEEEE.
+  - speakerName: L'enfant
+    text: "Ma peluche\u2026tu l\u2019a ? oh non\u2026 s\u2019il te plait continue de la chercher ! "
     voiceClip: {fileID: 0}

@@ -13,18 +13,24 @@ MonoBehaviour:
   m_Name: Child_FirstDialogue
   m_EditorClassIdentifier: Assembly-CSharp::DialogueDataSO
   lines:
-  - speakerName: Valou
-    text: Tu... tu pourrais m'aider ?
+  - speakerName: "Pr\xEAtre"
+    text: 'Que fais- tu ici ? '
     voiceClip: {fileID: 0}
-  - speakerName: Chris
-    text: "Oui bien s\xFBr. De quoi as-tu besoin ?"
+  - speakerName: L'enfant
+    text: "Je..  je crois que je me suis perdu\u2026  je ne sais plus trop\u2026 j\u2019\xE9tais avec papa et maman\u2026 j\u2019ai vu une grosse bete avec des yeux rouges\u2026 et le noir\u2026 "
     voiceClip: {fileID: 0}
-  - speakerName: Valou
-    text: "J'ai besoin que tu me ram\xE8nes du saucisson."
+  - speakerName: L'enfant
+    text: "Je me souviens juste m'\xEAtre cach\xE9 ici en attendant que mes parents viennent me chercher\u2026 ils vont venir hein ?  "
     voiceClip: {fileID: 0}
-  - speakerName: Chris
-    text: "Oui pas de probl\xE8me je te ram\xE8ne \xE7a tout de suite."
+  - speakerName: "Pr\xEAtre"
+    text: "Oui \xE7a va aller."
     voiceClip: {fileID: 0}
-  - speakerName: Valou
-    text: "Et plus vite que \xE7a."
+  - speakerName: L'enfant
+    text: "Mais j\u2019ai perdu ma peluche\u2026 dis tu peux aller me la chercher? c\u2019\xE9tait un cadeau de mon papa\u2026 elle me prot\xE8gera ! "
+    voiceClip: {fileID: 0}
+  - speakerName: "Pr\xEAtre"
+    text: "Oui ne t\u2019en fais pas mon grand je vais la retrouver et apr\xE8s on ira chercher tes parents. "
+    voiceClip: {fileID: 0}
+  - speakerName: L'enfant
+    text: "Merci\u2026il fait tellement noir\u2026et j\u2019ai froid\u2026 promis je reste sage et ne bouge pas d\u2019ici."
     voiceClip: {fileID: 0}
