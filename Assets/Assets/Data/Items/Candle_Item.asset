@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Candle_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDataSO
   itemID: candle
-  itemName: Candle
-  description: Candle Candle Candle Candle Candle Candle Candle
+  itemName: Cierge
+  description: "Utilis\xE9 pour honorer dieu qui veille sur les mortels, il apporte sa lumi\xE8re aux zones d\u2019ombres."
   icon: {fileID: 7885844976668849345, guid: 96fafbbf3a3076b4da69a649fe30d9f3, type: 3}
   category: 1
   maxStack: 99
