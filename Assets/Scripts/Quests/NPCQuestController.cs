@@ -1,4 +1,3 @@
-
 using System.Collections;
 using UnityEngine;
 
@@ -9,6 +8,14 @@ public class NPCQuestController : MonoBehaviour
         NotStarted,
         Active,
         Completed
+    }
+
+    private enum DialogueType
+    {
+        None,
+        First,
+        Reminder,
+        Completion
     }
 
     [Header("Quest")]
@@ -23,6 +30,7 @@ public class NPCQuestController : MonoBehaviour
     [SerializeField] private float disappearanceDelay = 1f;
 
     private QuestState state = QuestState.NotStarted;
+    private DialogueType currentDialogueType = DialogueType.None;
     private bool interactionInProgress;
 
     public bool CanInteract =>
@@ -40,24 +48,32 @@ public class NPCQuestController : MonoBehaviour
 
         DialogueDataSO dialogue = null;
 
-        switch (state)
+        if (state == QuestState.NotStarted)
         {
-            case QuestState.NotStarted:
-                dialogue = quest.firstDialogue;
-                break;
-
-            case QuestState.Active:
-                dialogue = HasRequiredItem()
-                    ? quest.completionDialogue
-                    : quest.reminderDialogue;
-                break;
+            currentDialogueType = DialogueType.First;
+            dialogue = quest.firstDialogue;
+        }
+        else if (state == QuestState.Active)
+        {
+            if (HasRequiredItem())
+            {
+                currentDialogueType = DialogueType.Completion;
+                dialogue = quest.completionDialogue;
+            }
+            else
+            {
+                currentDialogueType = DialogueType.Reminder;
+                dialogue = quest.reminderDialogue;
+            }
         }
 
-        if (dialogue == null)
+        if (dialogue == null ||
+            dialogue.lines == null ||
+            dialogue.lines.Count == 0)
         {
+            currentDialogueType = DialogueType.None;
             Debug.LogWarning(
-                "Dialogue manquant pour la quête : " +
-                quest.questName
+                "Dialogue manquant pour : " + quest.questName
             );
             return;
         }
@@ -74,17 +90,19 @@ public class NPCQuestController : MonoBehaviour
 
         interactionInProgress = false;
 
-        if (state == QuestState.NotStarted)
-        {
-            state = QuestState.Active;
+        DialogueType finishedType = currentDialogueType;
+        currentDialogueType = DialogueType.None;
 
-            Debug.Log("Quête commencée : " + quest.questName);
-            return;
-        }
-
-        if (state == QuestState.Active && HasRequiredItem())
+        switch (finishedType)
         {
-            CompleteQuest();
+            case DialogueType.First:
+                state = QuestState.Active;
+                Debug.Log("Quête commencée : " + quest.questName);
+                break;
+
+            case DialogueType.Completion:
+                CompleteQuest();
+                break;
         }
     }
 
@@ -97,6 +115,9 @@ public class NPCQuestController : MonoBehaviour
 
     private void CompleteQuest()
     {
+        if (!HasRequiredItem())
+            return;
+
         if (!inventory.RemoveItem(
             quest.requiredItem,
             quest.requiredQuantity))
@@ -104,7 +125,12 @@ public class NPCQuestController : MonoBehaviour
 
         state = QuestState.Completed;
 
-        Debug.Log("Quête terminée : " + quest.questName);
+        if (QuestManager.Instance != null)
+            QuestManager.Instance.CompleteQuest(quest);
+        else
+            Debug.LogWarning(
+                "QuestManager absent de la scène."
+            );
 
         StartCoroutine(Disappear());
     }

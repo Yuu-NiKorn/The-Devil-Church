@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerInventory))]
@@ -13,10 +12,11 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private PlayerInventory inventory;
     [SerializeField] private PickupPromptUI pickupPrompt;
 
-    private readonly Collider[] results = new Collider[32];
+    private readonly Collider[] results = new Collider[64];
 
     private ItemPickup currentPickup;
     private NPCInteraction currentNPC;
+    private DoorController currentDoor;
 
     private void Awake()
     {
@@ -35,23 +35,21 @@ public class PlayerInteractor : MonoBehaviour
         if (currentNPC != null)
         {
             NPCInteraction npc = currentNPC;
-
-            currentNPC = null;
-            currentPickup = null;
-
-            if (pickupPrompt != null)
-                pickupPrompt.Hide();
-
+            ClearTargets();
+            HidePrompt();
             npc.Interact();
+        }
+        else if (currentDoor != null)
+        {
+            currentDoor.Interact(inventory);
+            HidePrompt();
         }
         else if (currentPickup != null)
         {
             if (currentPickup.TryPickup(inventory))
             {
-                currentPickup = null;
-
-                if (pickupPrompt != null)
-                    pickupPrompt.Hide();
+                ClearTargets();
+                HidePrompt();
             }
         }
     }
@@ -62,23 +60,18 @@ public class PlayerInteractor : MonoBehaviour
             return;
 
         if (currentNPC != null)
-        {
             pickupPrompt.Show(currentNPC);
-        }
+        else if (currentDoor != null)
+            pickupPrompt.Show(currentDoor, inventory);
         else if (currentPickup != null)
-        {
             pickupPrompt.Show(currentPickup);
-        }
         else
-        {
             pickupPrompt.Hide();
-        }
     }
 
     private void FindClosestInteractable()
     {
-        currentPickup = null;
-        currentNPC = null;
+        ClearTargets();
 
         float closestDistance = interactionRadius;
 
@@ -97,7 +90,6 @@ public class PlayerInteractor : MonoBehaviour
             if (hit == null)
                 continue;
 
-            // Recherche d'un PNJ
             NPCInteraction npc =
                 hit.GetComponentInParent<NPCInteraction>();
 
@@ -114,14 +106,33 @@ public class PlayerInteractor : MonoBehaviour
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
+                    ClearTargets();
                     currentNPC = npc;
-                    currentPickup = null;
                 }
 
                 continue;
             }
 
-            // Recherche d'un objet
+            DoorController door =
+                hit.GetComponentInParent<DoorController>();
+
+            if (door != null)
+            {
+                float distance = Vector3.Distance(
+                    transform.position,
+                    door.InteractionPosition
+                );
+
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    ClearTargets();
+                    currentDoor = door;
+                }
+
+                continue;
+            }
+
             ItemPickup pickup =
                 hit.GetComponentInParent<ItemPickup>();
 
@@ -136,25 +147,34 @@ public class PlayerInteractor : MonoBehaviour
             if (pickupDistance < closestDistance)
             {
                 closestDistance = pickupDistance;
+                ClearTargets();
                 currentPickup = pickup;
-                currentNPC = null;
             }
         }
     }
 
-    private void OnDisable()
+    private void ClearTargets()
     {
         currentPickup = null;
         currentNPC = null;
+        currentDoor = null;
+    }
 
+    private void HidePrompt()
+    {
         if (pickupPrompt != null)
             pickupPrompt.Hide();
+    }
+
+    private void OnDisable()
+    {
+        ClearTargets();
+        HidePrompt();
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
-
         Gizmos.DrawWireSphere(
             transform.position,
             interactionRadius

@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using TMPro;
 
@@ -17,9 +16,13 @@ public class PickupPromptUI : MonoBehaviour
     [Header("Interaction Text")]
     [SerializeField] private string pickupText = "[E] Récupérer";
     [SerializeField] private string talkText = "[E] Parler";
+    [SerializeField] private string openText = "[E] Ouvrir";
+    [SerializeField] private string closeText = "[E] Fermer";
+    [SerializeField] private string lockedText = "[E] Verrouillée";
 
     private ItemPickup targetPickup;
     private NPCInteraction targetNPC;
+    private DoorController targetDoor;
 
     private void Awake()
     {
@@ -37,23 +40,19 @@ public class PickupPromptUI : MonoBehaviour
         if (playerCamera == null)
             return;
 
-        if (targetPickup != null)
-        {
-            transform.position =
-                targetPickup.InteractionPosition + worldOffset;
-        }
-        else if (targetNPC != null)
-        {
-            transform.position =
-                targetNPC.InteractionPosition + worldOffset;
-        }
-        else
-        {
-            return;
-        }
+        Vector3 position;
 
-        transform.rotation =
-            playerCamera.transform.rotation;
+        if (targetPickup != null)
+            position = targetPickup.InteractionPosition;
+        else if (targetNPC != null)
+            position = targetNPC.InteractionPosition;
+        else if (targetDoor != null)
+            position = targetDoor.InteractionPosition;
+        else
+            return;
+
+        transform.position = position + worldOffset;
+        transform.rotation = playerCamera.transform.rotation;
     }
 
     public void Show(ItemPickup pickup)
@@ -63,14 +62,9 @@ public class PickupPromptUI : MonoBehaviour
 
         targetPickup = pickup;
         targetNPC = null;
+        targetDoor = null;
 
-        if (keyText != null)
-            keyText.text = pickupText;
-
-        if (itemNameText != null)
-            itemNameText.text = pickup.ItemData.itemName;
-
-        ShowCanvas();
+        SetText(pickupText, pickup.ItemData.itemName);
     }
 
     public void Show(NPCInteraction npc)
@@ -78,20 +72,40 @@ public class PickupPromptUI : MonoBehaviour
         if (npc == null)
             return;
 
-        targetNPC = npc;
         targetPickup = null;
+        targetNPC = npc;
+        targetDoor = null;
 
-        if (keyText != null)
-            keyText.text = talkText;
-
-        if (itemNameText != null)
-            itemNameText.text = "";
-
-        ShowCanvas();
+        SetText(talkText, "");
     }
 
-    private void ShowCanvas()
+    public void Show(DoorController door, PlayerInventory inventory)
     {
+        if (door == null)
+            return;
+
+        targetPickup = null;
+        targetNPC = null;
+        targetDoor = door;
+
+        string text;
+
+        if (door.IsLocked && !door.CanOpen(inventory))
+            text = lockedText;
+        else
+            text = door.IsOpen ? closeText : openText;
+
+        SetText(text, "");
+    }
+
+    private void SetText(string action, string itemName)
+    {
+        if (keyText != null)
+            keyText.text = action;
+
+        if (itemNameText != null)
+            itemNameText.text = itemName;
+
         if (canvasGroup != null)
             canvasGroup.alpha = 1f;
     }
@@ -100,6 +114,7 @@ public class PickupPromptUI : MonoBehaviour
     {
         targetPickup = null;
         targetNPC = null;
+        targetDoor = null;
 
         if (canvasGroup != null)
             canvasGroup.alpha = 0f;
