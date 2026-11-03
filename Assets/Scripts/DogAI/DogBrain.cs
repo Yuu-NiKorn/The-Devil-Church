@@ -42,7 +42,10 @@ public class DogBrain : MonoBehaviour
     private float investigateTimer;
     private float searchTimer;
 
+    private bool forcedChase;
+
     public DogState CurrentState => currentState;
+    public bool IsForcedChase => forcedChase;
 
     private void Awake()
     {
@@ -62,13 +65,21 @@ public class DogBrain : MonoBehaviour
         if (!agent.isOnNavMesh || player == null)
             return;
 
-        // La vision est prioritaire sur l'ouïe.
-        if (vision.CanSeePlayer && currentState != DogState.Chase)
+        if (forcedChase)
+        {
+            if (currentState != DogState.Chase)
+                ChangeState(DogState.Chase);
+
+            agent.SetDestination(player.position);
+            return;
+        }
+
+        if (vision.CanSeePlayer &&
+            currentState != DogState.Chase)
         {
             ChangeState(DogState.Chase);
         }
 
-        // Un bruit peut interrompre la patrouille ou la recherche.
         if (hearing.HasHeardNoise)
         {
             if (currentState != DogState.Chase)
@@ -99,14 +110,37 @@ public class DogBrain : MonoBehaviour
         }
     }
 
+    public void StartForcedChase()
+    {
+        forcedChase = true;
+
+        if (player == null || !agent.isOnNavMesh)
+        {
+            Debug.LogWarning(
+                "Impossible de lancer la poursuite forcée.",
+                this
+            );
+            return;
+        }
+
+        ChangeState(DogState.Chase);
+        Debug.Log("Poursuite forcée activée.");
+    }
+
+    public void StopForcedChase()
+    {
+        forcedChase = false;
+
+        if (agent.isOnNavMesh)
+            ChangeState(DogState.Patrol);
+    }
+
     private void UpdateInvestigate()
     {
         investigateTimer += Time.deltaTime;
 
         if (investigateTimer >= investigateDuration)
-        {
             ChangeState(DogState.Patrol);
-        }
     }
 
     private void UpdateChase()
@@ -115,7 +149,6 @@ public class DogBrain : MonoBehaviour
         {
             lastKnownPosition = player.position;
             lostSightTimer = 0f;
-
             agent.SetDestination(player.position);
         }
         else

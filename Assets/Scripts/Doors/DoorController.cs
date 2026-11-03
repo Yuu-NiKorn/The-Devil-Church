@@ -1,3 +1,5 @@
+
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -24,9 +26,13 @@ public class DoorController : MonoBehaviour
 
     private bool isOpen;
     private bool isLocked;
+    private bool permanentlyLocked;
 
     public bool IsOpen => isOpen;
-    public bool IsLocked => isLocked;
+    public bool IsLocked => isLocked || permanentlyLocked;
+    public bool IsPermanentlyLocked => permanentlyLocked;
+
+    public event Action OnDoorClosed;
 
     public Vector3 InteractionPosition =>
         interactionPoint != null
@@ -39,6 +45,7 @@ public class DoorController : MonoBehaviour
             doorPivot = transform;
 
         closedRotation = doorPivot.localRotation;
+
         openedRotation = closedRotation *
             Quaternion.Euler(0f, 0f, -openAngle);
 
@@ -51,6 +58,9 @@ public class DoorController : MonoBehaviour
 
     public void Interact(PlayerInventory inventory)
     {
+        if (permanentlyLocked)
+            return;
+
         if (isLocked)
         {
             if (requiredItem == null ||
@@ -76,6 +86,9 @@ public class DoorController : MonoBehaviour
 
     public void Open()
     {
+        if (permanentlyLocked)
+            return;
+
         isLocked = false;
         AnimateDoor(true);
     }
@@ -87,7 +100,8 @@ public class DoorController : MonoBehaviour
 
     public void Unlock()
     {
-        isLocked = false;
+        if (!permanentlyLocked)
+            isLocked = false;
     }
 
     public void Lock()
@@ -96,8 +110,17 @@ public class DoorController : MonoBehaviour
             isLocked = true;
     }
 
+    public void LockPermanently()
+    {
+        permanentlyLocked = true;
+        isLocked = true;
+    }
+
     public bool CanOpen(PlayerInventory inventory)
     {
+        if (permanentlyLocked)
+            return false;
+
         if (!isLocked)
             return true;
 
@@ -111,14 +134,20 @@ public class DoorController : MonoBehaviour
         if (animationCoroutine != null)
             StopCoroutine(animationCoroutine);
 
+        bool wasOpen = isOpen;
         isOpen = open;
 
         animationCoroutine = StartCoroutine(
-            RotateDoor(open ? openedRotation : closedRotation)
+            RotateDoor(
+                open ? openedRotation : closedRotation,
+                !open && wasOpen
+            )
         );
     }
 
-    private IEnumerator RotateDoor(Quaternion target)
+    private IEnumerator RotateDoor(
+        Quaternion target,
+        bool notifyClosed)
     {
         Quaternion start = doorPivot.localRotation;
         float elapsed = 0f;
@@ -141,5 +170,8 @@ public class DoorController : MonoBehaviour
 
         doorPivot.localRotation = target;
         animationCoroutine = null;
+
+        if (notifyClosed)
+            OnDoorClosed?.Invoke();
     }
 }
