@@ -48,7 +48,11 @@ public class PlayerCandle : MonoBehaviour
         if (IsBurnedOut)
             return;
 
-        remainingTime -= Time.deltaTime;
+        if (PeacefulMode.Instance == null ||
+            !PeacefulMode.Instance.IsPeaceful)
+        {
+            remainingTime -= Time.deltaTime;
+        }
 
         if (remainingTime <= 0f)
         {

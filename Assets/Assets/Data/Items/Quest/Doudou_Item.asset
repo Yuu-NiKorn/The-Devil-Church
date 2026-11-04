@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDataSO
   itemID: Doudou_Item
   itemName: Doudou
-  description: Medallion_Item
+  description: 'Un ours en peluche. '
   icon: {fileID: -7089530933276561733, guid: 12a17915730ba8246b448f76bdb1fb00, type: 3}
   category: 2
   maxStack: 1

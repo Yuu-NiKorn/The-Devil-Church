@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Cross_Item
   m_EditorClassIdentifier: Assembly-CSharp::ItemDataSO
   itemID: cross
-  itemName: Cross
-  description: "Objet liturgique central qui symbolise la Passion et la R\xE9surrection. \n+40 sanity"
+  itemName: Croix du christ
+  description: "Repr\xE9sentation de la foi en dieux et signe de sa protection qui repousse toutes les malfaisances. \n+40 sanity"
   icon: {fileID: -7089530933276561733, guid: 12a17915730ba8246b448f76bdb1fb00, type: 3}
   category: 0
   maxStack: 10

@@ -36,7 +36,17 @@ public class EventTriggerZone : MonoBehaviour
             {
                 case ActionType.ActivateObject:
                     if (targetObject != null)
-                        targetObject.SetActive(true);
+                    {
+                        bool isDog =
+                            targetObject.GetComponent<DogBrain>() != null;
+
+                        bool canSpawn =
+                            PeacefulMode.Instance == null ||
+                            PeacefulMode.Instance.CanSpawnDog();
+
+                        if (!isDog || canSpawn)
+                            targetObject.SetActive(true);
+                    }
                     break;
 
                 case ActionType.DeactivateObject:
@@ -45,8 +55,12 @@ public class EventTriggerZone : MonoBehaviour
                     break;
 
                 case ActionType.ForceDogChase:
-                    if (targetDog != null)
+                    if (targetDog != null &&
+                        (PeacefulMode.Instance == null ||
+                         PeacefulMode.Instance.CanSpawnDog()))
+                    {
                         targetDog.StartForcedChase();
+                    }
                     break;
 
                 case ActionType.StopDogChase:

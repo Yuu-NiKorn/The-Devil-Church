@@ -15,7 +15,7 @@ MonoBehaviour:
   itemID: Cle
   itemName: "CL\xE9"
   description: "Cl\xE9"
-  icon: {fileID: 0}
+  icon: {fileID: -7089530933276561733, guid: 12a17915730ba8246b448f76bdb1fb00, type: 3}
   category: 2
   maxStack: 1
   sanityRestoreAmount: 0
