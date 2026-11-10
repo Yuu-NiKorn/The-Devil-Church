@@ -41,7 +41,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _ScreenIntensity: 5
+    - _Intensity: 0
+    - _ScreenIntensity: 8.35
     - _ScreenPower: 2.57
     m_Colors:
     - _Color: {r: 0.18867922, g: 0.020469919, b: 0.020469919, a: 1}
