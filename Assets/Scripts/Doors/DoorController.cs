@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections;
 using UnityEngine;
@@ -19,6 +18,7 @@ public class DoorController : MonoBehaviour
 
     [Header("Interaction")]
     [SerializeField] private Transform interactionPoint;
+    [SerializeField] private bool canInteractOnlyOnce;
 
     private Quaternion closedRotation;
     private Quaternion openedRotation;
@@ -27,10 +27,12 @@ public class DoorController : MonoBehaviour
     private bool isOpen;
     private bool isLocked;
     private bool permanentlyLocked;
+    private bool hasInteracted;
 
     public bool IsOpen => isOpen;
     public bool IsLocked => isLocked || permanentlyLocked;
     public bool IsPermanentlyLocked => permanentlyLocked;
+    public bool CanInteract => !permanentlyLocked && (!canInteractOnlyOnce || !hasInteracted);
 
     public event Action OnDoorClosed;
 
@@ -58,7 +60,7 @@ public class DoorController : MonoBehaviour
 
     public void Interact(PlayerInventory inventory)
     {
-        if (permanentlyLocked)
+        if (!CanInteract)
             return;
 
         if (isLocked)
@@ -77,6 +79,8 @@ public class DoorController : MonoBehaviour
 
             isLocked = false;
         }
+
+        hasInteracted = true;
 
         if (isOpen)
             Close();
@@ -118,7 +122,7 @@ public class DoorController : MonoBehaviour
 
     public bool CanOpen(PlayerInventory inventory)
     {
-        if (permanentlyLocked)
+        if (!CanInteract)
             return false;
 
         if (!isLocked)

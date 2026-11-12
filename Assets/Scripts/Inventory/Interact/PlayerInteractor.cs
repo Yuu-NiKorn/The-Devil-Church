@@ -61,7 +61,7 @@ public class PlayerInteractor : MonoBehaviour
 
         if (currentNPC != null)
             pickupPrompt.Show(currentNPC);
-        else if (currentDoor != null)
+        else if (currentDoor != null && currentDoor.CanInteract)
             pickupPrompt.Show(currentDoor, inventory);
         else if (currentPickup != null)
             pickupPrompt.Show(currentPickup);
@@ -118,6 +118,9 @@ public class PlayerInteractor : MonoBehaviour
 
             if (door != null)
             {
+                if (!door.CanInteract)
+                    continue;
+
                 float distance = Vector3.Distance(
                     transform.position,
                     door.InteractionPosition

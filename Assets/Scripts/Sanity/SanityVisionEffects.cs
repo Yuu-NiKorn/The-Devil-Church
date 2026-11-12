@@ -103,7 +103,6 @@
 //        image.color = color;
 //    }
 //}
-
 using UnityEngine;
 using UnityEngine.UI;
 
