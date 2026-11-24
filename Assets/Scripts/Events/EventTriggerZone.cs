@@ -27,6 +27,9 @@ public class EventTriggerZone : MonoBehaviour
         public DogBrain targetDog;
         public DoorController targetDoor;
 
+        [Header("Spawn Animation")]
+        public bool useSpawnAnimation;
+
         [Header("Custom Event")]
         public UnityEvent customEvent;
 
@@ -45,7 +48,13 @@ public class EventTriggerZone : MonoBehaviour
                             PeacefulMode.Instance.CanSpawnDog();
 
                         if (!isDog || canSpawn)
-                            targetObject.SetActive(true);
+                        {
+                            DogSpawnAnimation spawn = targetObject.GetComponent<DogSpawnAnimation>();
+                            if (useSpawnAnimation && spawn != null)
+                                spawn.PlaySpawn();
+                            else
+                                targetObject.SetActive(true);
+                        }
                     }
                     break;
 
@@ -59,7 +68,11 @@ public class EventTriggerZone : MonoBehaviour
                         (PeacefulMode.Instance == null ||
                          PeacefulMode.Instance.CanSpawnDog()))
                     {
-                        targetDog.StartForcedChase();
+                        DogSpawnAnimation spawn = targetDog.GetComponent<DogSpawnAnimation>();
+                        if (spawn != null && spawn.IsSpawning)
+                            spawn.QueueForcedChase();
+                        else
+                            targetDog.StartForcedChase();
                     }
                     break;
 
