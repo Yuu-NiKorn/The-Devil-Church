@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PeacefulMode : MonoBehaviour
 {
@@ -6,6 +7,7 @@ public class PeacefulMode : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private KeyCode toggleKey = KeyCode.P;
+    [SerializeField] private KeyCode toggleKeyRestart = KeyCode.P;
     [SerializeField] private bool peacefulOnStart = false;
 
     [Header("Dog")]
@@ -44,6 +46,20 @@ public class PeacefulMode : MonoBehaviour
                 (isPeaceful ? "ON" : "OFF")
             );
         }
+        if (Input.GetKeyDown(toggleKeyRestart))
+        {
+
+            Replay();
+        }
+    }
+    
+    public void Replay()
+    {
+        Time.timeScale = 1f;
+
+        SceneManager.LoadScene(
+            SceneManager.GetActiveScene().buildIndex
+        );
     }
 
     private void ApplyMode()
