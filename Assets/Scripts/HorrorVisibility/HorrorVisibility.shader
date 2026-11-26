@@ -29,6 +29,7 @@ Shader "Horror/Visibility"
             float4 _HVPositions[32];
             float4 _HVSettings[32];
             float _HVDarkness;
+            float _MinBrightness;
 
             half4 Frag(Varyings input) : SV_Target
             {
@@ -92,9 +93,10 @@ Shader "Horror/Visibility"
                     );
 
                     visibility = max(
-                        visibility,
-                        mask * strength
-                    );
+                            max(
+                            visibility,
+                            mask * strength),
+                        _MinBrightness);
                 }
 
                 float brightness = lerp(
@@ -103,6 +105,8 @@ Shader "Horror/Visibility"
                     saturate(visibility)
                 );
 
+                
+                
                 color.rgb *= brightness;
 
                 return color;

@@ -6,10 +6,18 @@ public class VisibilityManager : MonoBehaviour
     private const int MaxSources = 32;
 
     private static readonly List<VisibilitySource> sources = new();
+    
+    private static readonly int HvSourceCount = Shader.PropertyToID("_HVSourceCount");
+    private static readonly int HvPositions = Shader.PropertyToID("_HVPositions");
+    private static readonly int HvSettings = Shader.PropertyToID("_HVSettings");
+    private static readonly int HvDarkness = Shader.PropertyToID("_HVDarkness");
+    private static readonly int MinBrightness = Shader.PropertyToID("_MinBrightness");
 
     [Header("Darkness")]
     [Range(0f, 1f)]
     public float darkness = 0.99f;
+    [Range(0f, 1f)]
+    public float minBrightness = 0.2f;
 
     private readonly Vector4[] positions = new Vector4[MaxSources];
     private readonly Vector4[] settings = new Vector4[MaxSources];
@@ -55,10 +63,11 @@ public class VisibilityManager : MonoBehaviour
             count++;
         }
 
-        Shader.SetGlobalInt("_HVSourceCount", count);
-        Shader.SetGlobalVectorArray("_HVPositions", positions);
-        Shader.SetGlobalVectorArray("_HVSettings", settings);
-        Shader.SetGlobalFloat("_HVDarkness", darkness);
+        Shader.SetGlobalInt(HvSourceCount, count);
+        Shader.SetGlobalVectorArray(HvPositions, positions);
+        Shader.SetGlobalVectorArray(HvSettings, settings);
+        Shader.SetGlobalFloat(HvDarkness, darkness);
+        Shader.SetGlobalFloat(MinBrightness, minBrightness);
     }
 
     private void OnDisable()
